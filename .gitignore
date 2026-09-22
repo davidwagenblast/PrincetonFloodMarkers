@@ -1,0 +1,19 @@
+node_modules/
+dist/
+*.log
+.env
+.env.*
+!.env.example
+
+# SQLite database files
+server/data/*.db
+server/data/*.db-*
+
+# User-uploaded photos
+server/uploads/
+
+# Local Claude Code / editor config
+.claude/
+
+# Private Node.js downloaded by scripts/setup.sh
+.node/

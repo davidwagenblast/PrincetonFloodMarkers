@@ -1,0 +1,7 @@
+# Address ranges allowed to use the site while access is restricted.
+# Only enforced when the server runs with IP_ALLOWLIST=on (see README).
+# One CIDR range or single address per line; '#' starts a comment.
+
+128.112.0.0/16    # 128.112.0.0 – 128.112.255.255
+140.180.0.0/16    # 140.180.0.0 – 140.180.255.255
+204.153.48.0/22   # 204.153.48.0 – 204.153.51.255

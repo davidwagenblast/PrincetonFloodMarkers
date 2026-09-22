@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=../.env --watch --disable-warning=ExperimentalWarning src/index.js",
+    "start": "node --env-file-if-exists=../.env --disable-warning=ExperimentalWarning src/index.js",
+    "db:init": "node --env-file-if-exists=../.env --disable-warning=ExperimentalWarning src/db.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "zod": "^3.25.76"
+  }
+}
