@@ -19,9 +19,9 @@ export const geodeticPinSvg = (fill = '#17624f') => `
   <circle cx="12" cy="12.6" r="1.1" fill="#fff"/>
 </svg>`;
 
-const makePin = (html) =>
+const makePin = (html, className = 'fm-pin') =>
   L.divIcon({
-    className: 'fm-pin',
+    className,
     html,
     iconSize: [28, 40],
     iconAnchor: [14, 40],
@@ -32,4 +32,9 @@ export const markerPin = makePin(floodPinSvg());
 export const geodeticPin = makePin(geodeticPinSvg());
 export const draftPin = makePin(floodPinSvg('#3f63e0'));
 
-export const pinFor = (kind) => (kind === 'geodetic' ? geodeticPin : markerPin);
+// Enlarged and outlined, for the marker whose details are open in the embed panel.
+const selectedMarkerPin = makePin(floodPinSvg(), 'fm-pin fm-pin-selected');
+const selectedGeodeticPin = makePin(geodeticPinSvg(), 'fm-pin fm-pin-selected');
+
+export const pinFor = (kind, selected = false) =>
+  kind === 'geodetic' ? (selected ? selectedGeodeticPin : geodeticPin) : selected ? selectedMarkerPin : markerPin;
