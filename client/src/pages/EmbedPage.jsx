@@ -22,7 +22,7 @@ function fullSiteUrl(view, kind, markerId) {
 }
 
 /**
- * The map for embedding in other sites with an <iframe> (see /share for the code).
+ * The map for embedding in other sites with an <iframe> (the code is built on the About page).
  * No site header; marker details open in a side panel (or a bottom sheet on narrow embeds)
  * instead of a small popup, so they stay readable inside a frame.
  *

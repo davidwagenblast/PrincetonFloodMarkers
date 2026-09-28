@@ -3,6 +3,9 @@
 
 export const REGION_LABEL = import.meta.env.VITE_REGION_LABEL ?? 'Princeton';
 
+// Where the About page links for the source code; empty to hide the link.
+export const SOURCE_URL = import.meta.env.VITE_SOURCE_URL ?? 'https://github.com/davidwagenblast/PrincetonFloodMarkers';
+
 const [lat, lng, zoom] = (import.meta.env.VITE_DEFAULT_VIEW ?? '40.3350,-74.6800,12').split(',').map(Number);
 export const DEFAULT_CENTER = [lat, lng];
 export const DEFAULT_ZOOM = zoom;

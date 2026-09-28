@@ -5,7 +5,7 @@ markers and geodetic survey marks.
 
 ## Embedding the map
 
-Other websites can show the map in an `<iframe>`. The **Embed** page (`/share`) builds the code, with a live preview:
+Other websites can show the map in an `<iframe>`. The **Embed the map** section of the About page (`/about#embed`) builds the code, with a live preview:
 
 ```html
 <iframe src="https://your-site.example/embed" title="Flood marker map" width="100%" height="500"
