@@ -97,7 +97,7 @@ export function AttributionPrefix({ html }) {
  * A map marker. `children`, if given, are rendered into the marker's popup via a portal,
  * so popup content is ordinary React (with context, state and escaping).
  */
-export function Marker({ position, icon, title, draggable = false, eventHandlers, markerRef, popupOptions, children }) {
+export function Marker({ position, icon, title, zIndexOffset = 0, draggable = false, eventHandlers, markerRef, popupOptions, children }) {
   const map = useLeafletMap();
   const [lat, lng] = position;
   const [marker] = useState(() => L.marker([lat, lng], { icon, title, draggable }));
@@ -124,6 +124,10 @@ export function Marker({ position, icon, title, draggable = false, eventHandlers
   useEffect(() => {
     if (icon) marker.setIcon(icon);
   }, [marker, icon]);
+
+  useEffect(() => {
+    marker.setZIndexOffset(zIndexOffset);
+  }, [marker, zIndexOffset]);
 
   useEffect(() => {
     if (!eventTypes) return;

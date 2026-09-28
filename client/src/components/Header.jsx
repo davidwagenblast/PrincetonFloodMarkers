@@ -13,6 +13,7 @@ export default function Header() {
           Map
         </NavLink>
         <NavLink to="/contribute">Contribute</NavLink>
+        <NavLink to="/about">About</NavLink>
       </nav>
     </header>
   );

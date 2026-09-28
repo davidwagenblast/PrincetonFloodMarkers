@@ -23,7 +23,18 @@ const allowlist = ipAllowlist();
 if (allowlist) app.use(allowlist);
 
 const IMG_SRC = ["'self'", 'data:', 'blob:', 'https://tile.openstreetmap.org', 'https://*.tile.openstreetmap.org'];
-app.use(helmet({ contentSecurityPolicy: { directives: { 'img-src': IMG_SRC } } }));
+const pageHeaders = helmet({ contentSecurityPolicy: { directives: { 'img-src': IMG_SRC } } });
+
+// The embeddable map (/embed) may be framed by other sites: any site by default, or only the
+// origins listed in EMBED_ALLOWED_ORIGINS. Every other page keeps refusing to be framed.
+const embedAncestors = process.env.EMBED_ALLOWED_ORIGINS?.split(/[\s,]+/).filter(Boolean) ?? [];
+const embedHeaders = helmet({
+  contentSecurityPolicy: {
+    directives: { 'img-src': IMG_SRC, 'frame-ancestors': ["'self'", ...(embedAncestors.length ? embedAncestors : ['*'])] },
+  },
+  frameguard: false,
+});
+app.use((req, res, next) => (req.path === '/embed' || req.path === '/embed/' ? embedHeaders : pageHeaders)(req, res, next));
 
 const api = express.Router();
 api.use(csrfGuard);

@@ -20,6 +20,9 @@ function boundsParam(map) {
 
 /**
  * The public marker map: search, Flood/Geodetic toggle, and marker popups.
+ * With onSelect, markers have no popups: clicking one calls onSelect(marker) instead, and
+ * selectedId highlights it (used by the embed, which shows details in its own panel).
+ * renderControls({ search, toggle }) lets the caller lay out the search box and toggle.
  */
 export default function MarkerMap({
   center = DEFAULT_CENTER,
@@ -28,6 +31,10 @@ export default function MarkerMap({
   focusId = null,
   onMap,
   onKindChange,
+  onSelect,
+  selectedId = null,
+  showSearch = true,
+  renderControls,
   className = '',
 }) {
   const [map, setMap] = useState(null);
@@ -36,6 +43,7 @@ export default function MarkerMap({
   const [loadError, setLoadError] = useState(null);
   const markerRefs = useRef(new Map());
   const openMarkerId = useRef(null);
+  if (onSelect) openMarkerId.current = selectedId;
 
   const ready = (instance) => {
     setMap(instance);
@@ -84,10 +92,10 @@ export default function MarkerMap({
     (m) => {
       if (!map) return;
       setMarkers((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
-      map.once('moveend', () => markerRefs.current.get(m.id)?.openPopup());
+      map.once('moveend', () => (onSelect ? onSelect(m) : markerRefs.current.get(m.id)?.openPopup()));
       map.flyTo([m.latitude, m.longitude], Math.max(map.getZoom(), 16), { duration: 0.8 });
     },
-    [map]
+    [map, onSelect]
   );
 
   useEffect(() => {
@@ -97,6 +105,9 @@ export default function MarkerMap({
       .catch(() => {});
   }, [map, focusId, focusMarker]);
 
+  const search = showSearch && <SearchBox onSelectMarker={focusMarker} onSelectPlace={(p) => map && flyToPlace(map, p)} />;
+  const toggle = <KindToggle value={kind} onChange={changeKind} />;
+
   return (
     <div className={`fm-marker-map ${className}`}>
       <LeafletMap onReady={ready} center={center} zoom={zoom} zoomControl={false} worldCopyJump>
@@ -104,32 +115,49 @@ export default function MarkerMap({
         <AttributionPrefix html={ATTRIBUTION_PREFIX} />
         <ScaleControl position="bottomleft" />
         <ZoomControl position="bottomright" />
-        {markers.map((m) => (
-          <Marker
-            key={m.id}
-            position={[m.latitude, m.longitude]}
-            icon={pinFor(m.kind)}
-            title={m.title}
-            eventHandlers={{
-              popupopen: () => (openMarkerId.current = m.id),
-              popupclose: () => openMarkerId.current === m.id && (openMarkerId.current = null),
-            }}
-            markerRef={(ref) => (ref ? markerRefs.current.set(m.id, ref) : markerRefs.current.delete(m.id))}
-            popupOptions={{
-              className: 'fm-leaflet-popup',
-              minWidth: 250,
-              maxWidth: 250,
-              maxHeight: Math.max(220, window.innerHeight - 220),
-              autoPanPaddingTopLeft: [20, 150],
-            }}
-          >
-            <MarkerPopup marker={m} />
-          </Marker>
-        ))}
+        {markers.map((m) =>
+          onSelect ? (
+            <Marker
+              key={m.id}
+              position={[m.latitude, m.longitude]}
+              icon={pinFor(m.kind, m.id === selectedId)}
+              zIndexOffset={m.id === selectedId ? 1000 : 0}
+              title={m.title}
+              eventHandlers={{ click: () => onSelect(m) }}
+            />
+          ) : (
+            <Marker
+              key={m.id}
+              position={[m.latitude, m.longitude]}
+              icon={pinFor(m.kind)}
+              title={m.title}
+              eventHandlers={{
+                popupopen: () => (openMarkerId.current = m.id),
+                popupclose: () => openMarkerId.current === m.id && (openMarkerId.current = null),
+              }}
+              markerRef={(ref) => (ref ? markerRefs.current.set(m.id, ref) : markerRefs.current.delete(m.id))}
+              popupOptions={{
+                className: 'fm-leaflet-popup',
+                minWidth: 250,
+                maxWidth: 250,
+                maxHeight: Math.max(220, window.innerHeight - 220),
+                autoPanPaddingTopLeft: [20, 150],
+              }}
+            >
+              <MarkerPopup marker={m} />
+            </Marker>
+          )
+        )}
       </LeafletMap>
 
-      <SearchBox onSelectMarker={focusMarker} onSelectPlace={(p) => map && flyToPlace(map, p)} />
-      <KindToggle value={kind} onChange={changeKind} />
+      {renderControls ? (
+        renderControls({ search, toggle })
+      ) : (
+        <>
+          {search}
+          {toggle}
+        </>
+      )}
       {loadError && <div className="fm-alert error fm-map-error">{loadError}</div>}
     </div>
   );
