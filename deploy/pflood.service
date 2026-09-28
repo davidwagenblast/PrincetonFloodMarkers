@@ -1,0 +1,27 @@
+# systemd unit for the PFlood production instance.
+# Install (as root):  cp deploy/pflood.service /etc/systemd/system/ && systemctl daemon-reload
+#                     systemctl enable --now pflood
+# Assumes the app is checked out at /home/pflood/app and owned by the 'pflood' service account.
+[Unit]
+Description=PFlood flood-marker map (Node.js)
+After=network.target
+
+[Service]
+Type=simple
+User=pflood
+Group=pflood
+WorkingDirectory=/home/pflood/app/server
+Environment=NODE_ENV=production
+ExecStart=/home/pflood/app/.node/bin/node --env-file=/home/pflood/app/.env --disable-warning=ExperimentalWarning src/index.js
+Restart=on-failure
+RestartSec=5
+
+# Hardening (options supported by EL7's systemd 219)
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+# Keep the app from crowding out Apache/databases on a small shared host
+MemoryLimit=400M
+
+[Install]
+WantedBy=multi-user.target

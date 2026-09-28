@@ -12,3 +12,6 @@ Other websites can show the map in an `<iframe>`.
         style="border:0;border-radius:12px" loading="lazy"></iframe>
 ```
 
+## Deploying
+
+See [deploy/README.md](deploy/README.md) for running it behind Apache on a Linux server.
